@@ -25,12 +25,13 @@ MiniCPM is an End-Side LLM developed by ModelBest Inc. and TsinghuaNLP, with onl
 - MiniCPM can be deployed and infer on smartphones, and the speed of streaming output is relatively higher than human verbal speed. MiniCPM-V has also successfully deployed multi-modal models on smartphones.
 - The cost of developing based on MiniCPM is low. Parameter efficient finetuning can be conducted with a single 1080/2080 GPU and full parameter finetuning can be conducted with a 3090/4090 GPU.
 
-We release all model parameters for research and limited commercial use. In future, we will also release all the checkpoint during training and most public training data for research on model mechanism.
+We release all model parameters for research and limited commercial use. 
 
 - SFT and DPO version based on MiniCPM-2B and human preference: **MiniCPM-2B-SFT/DPO**
 - The multi-modal model **MiniCPM-V** based on MiniCPM-2B, which outperforms models with similar size, i.e., Phi-2
 - The INT4 quantized version **MiniCPM-2B-SFT/DPO-Int4** based on MiniCPM-2B-SFT/DPO
 - Mobile phone application based on MLC-LLM and LLMFarm. Both language model and multimodel model can conduct inference on smartphones.
+- 30 Intermidiate [checkpoints](https://huggingface.co/openbmb/MiniCPM-2B-history) for academic purpose.
 
 ### Limitations
 
@@ -56,6 +57,7 @@ We release all model parameters for research and limited commercial use. In futu
 <p id="0"></p>
 
 ## Update Log
+- 2024/03/16 Intermediate checkpoints were released [here](https://huggingface.co/openbmb/MiniCPM-2B-history)!
 - 2024/02/13 We support llama.cpp 
 - 2024/02/09 We have included a [Community](#community) section in the README to encourage support for MiniCPM from the open-source community.
 - 2024/02/08 We updated the [llama-format model weights](#llamaformat), which can be loaded into LlamaModel directly, making it more convenient for everyone to use our model quickly.
@@ -195,8 +197,8 @@ python inference.py --model_path <vllmcpm_repo_path> --prompt_path prompts/promp
 ```
 
 
-#### llama.cpp and Ollama Inference
-We have supported inference with [llama.cpp](https://github.com/ggerganov/llama.cpp/) and [ollama](https://github.com/ollama/ollama).
+#### llama.cpp、Ollama、fastllm Inference
+We have supported inference with [llama.cpp](https://github.com/ggerganov/llama.cpp/) 、[ollama](https://github.com/ollama/ollama)、[fastllm](https://github.com/ztxz16/fastllm).
 
 
 **llama.cpp**
@@ -217,6 +219,21 @@ Solving [this issue](https://github.com/ollama/ollama/issues/2383)
 ## Community
 
 - [ChatLLM](https://github.com/foldl/chatllm.cpp) :[Run MiniCPM on CPU](https://huggingface.co/openbmb/MiniCPM-2B-dpo-bf16/discussions/2#65c59c4f27b8c11e43fc8796)
+
+**fastllm**
+1. [install fastllm]([fastllm](https://github.com/ztxz16/fastllm)
+2. inference
+```
+import torch
+from transformers import AutoTokenizer, LlamaTokenizerFast, AutoModelForCausalLM
+path = 'openbmb/MiniCPM-2B-dpo-fp16'
+tokenizer = AutoTokenizer.from_pretrained(path)
+model = AutoModelForCausalLM.from_pretrained(path, torch_dtype=torch.float16, device_map='cuda', trust_remote_code=True)
+from fastllm_pytools import llm
+llm.set_device_map("cpu")
+model = llm.from_hf(model, tokenizer, dtype = "float16") # dtype支持 "float16", "int8", "int4"
+print(model.response("<用户>Write an acrostic poem with the word MINICPM (One line per letter)<AI>", top_p=0.8, temperature=0.5, repeat_penalty=1.02))
+```
 
 
 

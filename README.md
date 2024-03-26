@@ -26,12 +26,13 @@ MiniCPM 是面壁智能与清华大学自然语言处理实验室共同开源的
 - 经过 Int4 量化后，MiniCPM 可在手机上进行部署推理，流式输出速度略高于人类说话速度。MiniCPM-V 也直接跑通了多模态大模型在手机上的部署。
 - 一张1080/2080可高效参数微调，一张3090/4090可全参数微调，一台机器可持续训练 MiniCPM，二次开发成本较低。
 
-我们完全开源MiniCPM-2B的模型参数供学术研究和有限商用，在未来我们还将发布训练过程中的所有Checkpoint和大部分非专有数据供模型机理研究。
+我们完全开源MiniCPM-2B的模型参数供学术研究和有限商用.
 具体而言，我们目前已公开以下模型，地址详见 [模型下载](#1) 部分
 - 基于MiniCPM-2B的指令微调与人类偏好对**MiniCPM-2B-SFT/DPO**。
 - 基于MiniCPM-2B的多模态模型**MiniCPM-V**，能力超越基于Phi-2的同参数级别多模态模型。
 - MiniCPM-2B-SFT/DPO的Int4量化版**MiniCPM-2B-SFT/DPO-Int4**。
 - 基于MLC-LLM、LLMFarm开发的MiniCPM手机端程序，**文本及多模态模型均可在手机端进行推理**。
+- 训练过程中的[30个Checkpoints](https://huggingface.co/openbmb/MiniCPM-2B-history)供模型机理研究。
 
 ### 局限性：
 
@@ -57,6 +58,7 @@ MiniCPM 是面壁智能与清华大学自然语言处理实验室共同开源的
 <p id="0"></p>
 
 ## 更新日志
+- 2024/03/16 minicpm-2b 的30余个中间检查点开放了！[huggingface链接](https://huggingface.co/openbmb/MiniCPM-2B-history)
 - 2024/02/13 支持了llama.cpp
 - 2024/02/09 我们在readme里加入了一个[开源社区](#community)章节，用来收集开源社区对MiniCPM的支持案例。
 - 2024/02/08 我们更新了[llama-format的模型权重](#llamaformat)，方便大家更加快捷地使用我们的模型。
@@ -202,8 +204,8 @@ python inference.py --model_path <vllmcpm_repo_path> --prompt_path prompts/promp
  The capital city of China is Beijing. Beijing is a major political, cultural, and economic center in China, and it is known for its rich history, beautiful architecture, and vibrant nightlife. It is also home to many of China's most important cultural and historical sites, including the Forbidden City, the Great Wall of China, and the Temple of Heaven. Beijing is a popular destination for tourists from around the world, and it is an important hub for international business and trade.
 ```
 
-#### llama.cpp与Ollama推理
-我们支持了[llama.cpp](https://github.com/ggerganov/llama.cpp/) 推理与[ollama](https://github.com/ollama/ollama)推理.
+#### llama.cpp、Ollama、fastllm推理
+我们支持了[llama.cpp](https://github.com/ggerganov/llama.cpp/) 推理、[ollama](https://github.com/ollama/ollama)推理、[fastllm](https://github.com/ztxz16/fastllm)推理.
 
 **llama.cpp**
 1. [安装llama.cpp](https://github.com/ggerganov/llama.cpp?tab=readme-ov-file#build)
@@ -217,6 +219,21 @@ python inference.py --model_path <vllmcpm_repo_path> --prompt_path prompts/promp
 **ollama**
 正在解决[这个问题](https://github.com/ollama/ollama/issues/2383)
 
+**fastllm**
+1. [编译安装fastllm](https://github.com/ztxz16/fastllm)
+2. 模型推理
+```
+import torch
+from transformers import AutoTokenizer, LlamaTokenizerFast, AutoModelForCausalLM
+path = 'openbmb/MiniCPM-2B-dpo-fp16'
+tokenizer = AutoTokenizer.from_pretrained(path)
+model = AutoModelForCausalLM.from_pretrained(path, torch_dtype=torch.float16, device_map='cuda', trust_remote_code=True)
+from fastllm_pytools import llm
+llm.set_device_map("cpu")
+model = llm.from_hf(model, tokenizer, dtype = "float16") # dtype支持 "float16", "int8", "int4"
+print(model.response("<用户>山东省最高的山是哪座山, 它比黄山高还是矮？差距多少？<AI>", top_p=0.8, temperature=0.5, repeat_penalty=1.02))
+```
+ 
 
 
 <p id="community"></p>

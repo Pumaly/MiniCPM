@@ -1,5 +1,7 @@
 # MiniCPM 微调
 
+（部分代码函数的文档由[RepoAgent](https://github.com/OpenBMB/RepoAgent)自动产生)
+
 [English Version](https://github.com/OpenBMB/MiniCPM/blob/main/finetune/README_en.md)
 
 本目录提供 MiniCPM-2B 模型的微调示例，包括全量微调和 PEFT。格式上，提供多轮对话微调样例和输入输出格式微调样例。
@@ -61,11 +63,6 @@ pip install -r requirements.txt
 ```
 
 ## 数据集格式示例
-
-这里以 AdvertiseGen 数据集为例,
-您可以从 [Google Drive](https://drive.google.com/file/d/13_vf0xRTQsyneRKdD1bZIr93vBGOczrk/view?usp=sharing)
-或者 [Tsinghua Cloud](https://cloud.tsinghua.edu.cn/f/b3f119a008264b1cabd1/?dl=1) 下载 AdvertiseGen 数据集。
-将解压后的 AdvertiseGen 目录放到 `data` 目录下并自行转换为如下格式数据集。
 
 > 请注意，现在的微调代码中加入了验证集，因此，对于一组完整的微调数据集，必须包含训练数据集和验证数据集，测试数据集可以不填写。或者直接用验证数据集代替。
 
